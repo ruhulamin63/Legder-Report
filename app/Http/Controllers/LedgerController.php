@@ -24,6 +24,67 @@ class LedgerController extends Controller
         }
     }
 
+    //all salesReport
+    public function productSaleDetails(){
+        try {
+            $allSaleDetails = DB::table('sale_details')
+            ->join('products', 'products.id', '=', 'sale_details.product_id')
+            ->join('sales', 'sales.id', '=', 'sale_details.sale_id')
+            ->select('sale_details.*', 'products.name', 'sales.date', 'sales.invoice')
+            ->get();
+            
+            $allPurchaseDetails = DB::table('purchase_details')->get();
+
+            //saleDetails
+            foreach ($allSaleDetails as $saleDetail) {
+                $saleDetails = DB::table('sale_details')
+                ->join('products', 'products.id', '=', 'sale_details.product_id')
+                ->join('sales', 'sales.id', '=', 'sale_details.sale_id')
+                ->where('sale_details.product_id', $saleDetail->product_id)
+                ->select('sale_details.*', 'products.name', 'sales.date', 'sales.invoice')
+                ->get();
+
+                //calculate total quantity and total amount stock in stock out in sale and purchase
+                $stockOut[] = $allSaleDetails->sum('quantity');
+                $totalAmount[] = $saleDetails->sum('total');
+            }
+
+            //purchaseDetails
+            foreach ($allPurchaseDetails as $purchaseDetail) {
+                $purchaseDetails = DB::table('purchase_details')
+                ->join('products', 'products.id', '=', 'purchase_details.product_id')
+                ->join('purchases', 'purchases.id', '=', 'purchase_details.purchase_id')
+                ->where('purchase_details.product_id', $purchaseDetail->product_id)
+                ->select('purchase_details.*', 'products.name', 'purchases.date', 'purchases.invoice')
+                ->get();
+
+                $stockIn[] = $purchaseDetails->sum('quantity');
+            }
+
+            // $stock = array_shift($stockIn);
+
+            for($i = 0; $i < count($stockIn); $i++){
+                $stock[] = $stockIn[$i] - $stockOut[$i];
+                $totalAmount[] = $totalAmount[$i];
+            }
+
+            // dd($allSaleDetails);
+
+            
+            return response([
+                'message' => 'success',
+                'saleDetails' => $allSaleDetails,
+                'totalAmount' => $totalAmount,
+                'stockIn' => $stockIn,
+                'stockOut' => $stockOut,
+                'stock' => $stock,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response(['message' => $e->getMessage()],422);
+        }
+    }
+
     //search product form date to date
     public function reportSales(Request $request){
         // dd($request->all());

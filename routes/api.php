@@ -24,4 +24,4 @@ Route::get('/ledger', [LedgerController::class, 'index'])->name('ledger.index');
 
 //ledger report
 Route::post('reports/sales', [LedgerController::class, 'reportSales'])->name('reports.sales');
-// Route::post('reports/purchases', [LedgerController::class, 'reportPurchases'])->name('reports.purchases');
+Route::get('products/sales', [LedgerController::class, 'productSaleDetails'])->name('products.sales');

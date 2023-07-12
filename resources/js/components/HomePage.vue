@@ -22,21 +22,6 @@
                 <div class="row filter-row">
                     <div class="col-sm-6 col-md-3"> 
                         <div class="form-group form-focus select-focus">
-                            
-                            <!-- <table>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <select class="select floating" v-model="items.product_id">
-                                                <option>-Select-</option>
-                                                <option v-for="(item, index) in itemArr" :key="index" v-bind:value="item.id">
-                                                    {{ item.product.name }}
-                                                </option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table> -->
                             <label class="focus-label">Purchased By</label>
                             <select class="form-control" @change="selectItem(2)">
                                 <option>-Select-</option>
@@ -69,7 +54,6 @@
                     </div>
                     <div class="col-sm-6 col-md-3">  
                         <!-- search button -->
-                        <!-- <a href="#" class="btn btn-success btn-block"> Search </a>   -->
                         <button type="submit" class="btn btn-success btn-block"> Search </button>
                     </div>
                 </div>
@@ -153,6 +137,7 @@
             },
 
             // insert search data
+            //how to filter search or how to get data from database
             search(){
                 axios.post(`/api/reports/sales`, this.item)
                     .then(response => {
@@ -170,11 +155,36 @@
                             this.ledgerReport[index].stock = this.stock;
                         });
 
-                        console.log('data=>', this.ledgerReport);
+                        // console.log('data=>', this.ledgerReport);
 
                     }).catch(error => {
                     console.log(error);
                 })
+            },
+
+            //get product details
+            async productDetails(){
+                await axios.get(`/api/products/sales`).then(({data})=>{
+                    this.ledgerReport = data.saleDetails;
+
+                    this.totalAmount = data.totalAmount;
+                    this.stockIn = data.stockIn;
+                    this.stockOut = data.stockOut;
+                    this.stock = data.stock;
+
+                    
+                    this.ledgerReport.forEach((item, index) => {
+                        this.ledgerReport[index].totalAmount = this.totalAmount[index];
+                        this.ledgerReport[index].stockIn = this.stockIn[index];
+                        this.ledgerReport[index].stockOut = this.stockOut[index];
+                        this.ledgerReport[index].stock = this.stock[index];
+                    });
+
+                    // console.log('data=>', this.ledgerReport);
+
+                }).catch((error)=>{
+                    console.log('error', error);
+                });
             },
 
             selectItem: function(id){
@@ -184,6 +194,7 @@
 
         mounted() {
             this.saleDetails();
+            this.productDetails();
         },
     }
 </script>
