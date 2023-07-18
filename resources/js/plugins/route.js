@@ -2,7 +2,7 @@ import {createWebHistory, createRouter} from "vue-router";
 //homepage
 
 //auth route
-import HomePage from "./components/HomePage.vue";
+import HomePage from "../components/HomePage.vue";
 
 const routes = [
     {

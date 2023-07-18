@@ -7,6 +7,9 @@
             <div class="page-header">
                 <div class="row">
                     <div class="col-sm-12">
+                        <!-- <v-btn color="primary" class="my-2">Button</v-btn> -->
+                        <v-alert dismissible type="success">Vueitfy installed successfully!</v-alert>
+
                         <h3 class="page-title">Ledger Report</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="#l">Dashboard</a></li>
