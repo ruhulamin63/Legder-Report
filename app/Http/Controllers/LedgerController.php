@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\SaleDetail;
 use DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class LedgerController extends Controller
 {
@@ -68,8 +69,37 @@ class LedgerController extends Controller
                 $totalAmount[] = $totalAmount[$i];
             }
 
-            // dd($allSaleDetails);
+           //pagination for saleDetails, stockIn, stockOut, stock, totalAmount
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $itemCollection = collect($allSaleDetails);
+            $perPage = 10;
+            $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+            $allSaleDetails = new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
+            // $allSaleDetails->setPath($request->url());
 
+            //================
+            $itemCollection = collect($stockIn);
+            $perPage = 10;
+            $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+            $stockIn = new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
+
+            //==============
+            $itemCollection = collect($stockOut);
+            $perPage = 10;
+            $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+            $stockOut = new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
+
+            //===============
+            $itemCollection = collect($stock);
+            $perPage = 10;
+            $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+            $stock = new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
+
+            //===============
+            $itemCollection = collect($totalAmount);
+            $perPage = 10;
+            $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+            $totalAmount = new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
             
             return response([
                 'message' => 'success',

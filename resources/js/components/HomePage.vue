@@ -9,7 +9,7 @@
                     <div class="col-sm-12">
                         <!-- <v-btn color="primary" class="my-2">Button</v-btn> -->
                         <v-alert dismissible type="success">Vueitfy installed successfully!</v-alert>
-                        <v-icon icon="fas fa-home" />
+                        <!-- <v-icon icon="fas fa-home" /> -->
 
                         <h3 class="page-title">Ledger Report</h3>
                         <ul class="breadcrumb">
@@ -93,6 +93,13 @@
                                 </tr>
                             </tbody>
                         </table>
+
+                        <!-- pagination -->
+                        <pagination v-if="pagination.last_page > 1"
+                            :pagination="pagination"
+                            :offset="5"
+                            @paginate="productDetails()">
+                        </pagination>
                     </div>
                 </div>
             </div>
@@ -104,9 +111,14 @@
 
 <script>
     import axios from 'axios';
+    import pagination from './partials/Pagination.vue';
     
     export default {
         name: "HomePage",
+
+        components: {
+            pagination,
+        },
 
         data() {
             return {
@@ -123,6 +135,10 @@
                     product_id: '',
                     form_date: '',
                     to_date: '',
+                },
+
+                pagination: {
+                    current_page:1,
                 },
             };
         },
@@ -168,14 +184,17 @@
 
             //get product details
             async productDetails(){
-                await axios.get(`/api/products/sales`).then(({data})=>{
-                    this.ledgerReport = data.saleDetails;
+                await axios.get('/api/products/sales?page=' + this.pagination.current_page).then(({data})=>{
+                    this.ledgerReport = data.saleDetails.data;
+                    this.pagination = data.saleDetails;
+                    // console.log('data=>', this.pagination);
 
-                    this.totalAmount = data.totalAmount;
-                    this.stockIn = data.stockIn;
-                    this.stockOut = data.stockOut;
-                    this.stock = data.stock;
+                    this.totalAmount = data.totalAmount.data;
+                    this.stockIn = data.stockIn.data;
+                    this.stockOut = data.stockOut.data;
+                    this.stock = data.stock.data;
 
+                    // console.log('data=>', this.ledgerReport);
                     
                     this.ledgerReport.forEach((item, index) => {
                         this.ledgerReport[index].totalAmount = this.totalAmount[index];
